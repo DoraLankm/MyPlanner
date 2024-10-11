@@ -14,7 +14,7 @@ namespace MyPlanner.Models
         public string? Description { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }
-        public List<TaskClass> Tasks { get; set; } = new List<TaskClass>();
+        public virtual List<TaskClass> Tasks { get; set; } = new List<TaskClass>();
         public DateTime CreationDate { get; set; } = DateTime.Now;
         public DateTime Deadline { get; set; }
         public Priority Priority { get; set; }
