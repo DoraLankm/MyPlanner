@@ -19,5 +19,7 @@ namespace MyPlanner.Models
         public DateTime Deadline { get; set; }
         public Priority Priority { get; set; }
         public Category Category { get; set; } = Category.None;
+
+        public bool IsOverdue => !IsCompleted && DateTime.Now > Deadline;
     }
 }

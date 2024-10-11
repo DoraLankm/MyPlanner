@@ -20,5 +20,7 @@ namespace MyPlanner.Models
         public int ProjectId { get; set; }
         public Project Project { get; set; }
         public virtual List<Note> Notes { get; set; } = new List<Note>();
+
+        public bool IsOverdue => Status != TaskStatus.Completed && DateTime.Now > Deadline;
     }
 }
