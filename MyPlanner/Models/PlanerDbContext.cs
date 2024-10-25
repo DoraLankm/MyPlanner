@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,13 @@ namespace MyPlanner.Models
         public PlanerDbContext(DbContextOptions<PlanerDbContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            optionsBuilder.UseNpgsql(connectionString); //использоваие строки подключения 
+            optionsBuilder.UseLazyLoadingProxies(); //использование ленивой загрузки
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
