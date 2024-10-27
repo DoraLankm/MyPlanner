@@ -1,0 +1,38 @@
+﻿<Window x:Class="MyPlanner.StartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyPlanner"
+        mc:Ignorable="d"
+        Title="Добро пожаловать в MyPlanner!" Width="500" Height="300"
+        ResizeMode="NoResize">
+        
+    <Window.Resources>
+        <!-- Цветовая схема проекта -->
+        <SolidColorBrush x:Key="Color1" Color="#FF003B46"/>
+        <SolidColorBrush x:Key="Color2" Color="#FF07575B"/>
+        <SolidColorBrush x:Key="Color3" Color="#FF66A5AD"/>
+        <SolidColorBrush x:Key="Color4" Color="#FFC4DFE6"/>
+
+        <!-- Стили для кнопок -->
+        <Style x:Key="MainButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="{StaticResource Color3}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Color1}"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Height" Value="50"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid  Background="{StaticResource Color2}">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Войти" Click="OpenLoginWindow" Margin="0,5" Style="{StaticResource MainButtonStyle}"/>
+            <Button Content="Зарегистрироваться" Click="OpenRegistrationWindow" Margin="0,5" Style="{StaticResource MainButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

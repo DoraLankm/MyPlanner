@@ -1,0 +1,36 @@
+﻿<Window x:Class="MyPlanner.TaskWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyPlanner"
+        mc:Ignorable="d"
+        Title="TaskWindow" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Название задачи -->
+        <Label Content="Название задачи:" Grid.Row="0" VerticalAlignment="Center"/>
+        <TextBox x:Name="txtTaskTitle" Grid.Row="0" Margin="150,0,0,0" Width="120"/>
+
+        <!-- Описание задачи -->
+        <Label Content="Описание задачи:" Grid.Row="1" VerticalAlignment="Center"/>
+        <TextBox x:Name="txtTaskDescription" Grid.Row="1" Margin="150,0,0,0" Width="120"/>
+
+        <!-- Дедлайн задачи -->
+        <Label Content="Дедлайн:" Grid.Row="2" VerticalAlignment="Center"/>
+        <DatePicker x:Name="dpTaskDeadline" Grid.Row="2" Margin="150,0,0,0" Width="120"/>
+
+        <!-- Кнопки -->
+        <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Right">
+            <Button Content="Создать" Width="80" Margin="5" Click="CreateButton_Click"/>
+            <Button Content="Отмена" Width="80" Margin="5" Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

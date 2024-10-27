@@ -12,9 +12,9 @@ namespace MyPlanner.Models
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int UserId { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
         public int TaskId { get; set; }
-        public TaskClass Task { get; set; }
+        public virtual TaskClass Task { get; set; }
     }
 }
