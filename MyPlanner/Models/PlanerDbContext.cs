@@ -16,6 +16,11 @@ namespace MyPlanner.Models
         public DbSet <TaskClass> Tasks { get; set; }
         public DbSet <Note> Notes { get; set; }
 
+        public PlanerDbContext()
+        {
+
+        }
+
         public PlanerDbContext(DbContextOptions<PlanerDbContext> options)
             : base(options)
         {
