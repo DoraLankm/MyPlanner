@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyPlanner"
         mc:Ignorable="d"
-        Title="Создание задачи" Height="170" Width="400"
+        Title="Создание задачи" Height="370" Width="400"
         ResizeMode="NoResize">
 
     <Window.Resources>
@@ -27,37 +27,59 @@
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="30"/>
         </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+
+        <!-- Стиль для DatePicker -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+
+        <!-- Стиль для Label -->
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+        </Style>
     </Window.Resources>
 
     <Grid Background="{StaticResource Color2}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
+        <Border Background="{StaticResource Color4}" BorderBrush="{StaticResource Color1}" BorderThickness="1" CornerRadius="5" Padding="10">
+            <StackPanel>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+                <!-- Название задачи -->
+                <Label Content="Название задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <TextBox x:Name="txtTaskTitle" HorizontalAlignment="Stretch"/>
 
-        <!-- Название задачи -->
-        <Label Content="Название задачи:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
-        <TextBox x:Name="txtTaskTitle" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch"/>
+                <!-- Описание задачи -->
+                <Label Content="Описание задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <TextBox x:Name="txtTaskDescription"  HorizontalAlignment="Stretch" AcceptsReturn="True" Height="60" TextWrapping="Wrap"/>
 
-        <!-- Описание задачи -->
-        <Label Content="Описание задачи:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
-        <TextBox x:Name="txtTaskDescription" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch"/>
+                <!-- Дедлайн задачи -->
+                <Label Content="Дедлайн:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <DatePicker x:Name="dpTaskDeadline" HorizontalAlignment="Stretch" Foreground="Black"/>
 
-        <!-- Дедлайн задачи -->
-        <Label Content="Дедлайн:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
-        <DatePicker x:Name="dpTaskDeadline" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Foreground="Black"/>
+                <!-- Кнопки -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Создать" Click="CreateButton_Click" Style="{StaticResource MainButtonStyle}" />
+                    <Button Content="Отмена" Click="CancelButton_Click" Style="{StaticResource MainButtonStyle}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
-        <!-- Кнопки -->
-        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center">
-            <Button Content="Создать" Click="CreateButton_Click" Style="{StaticResource MainButtonStyle}" />
-            <Button Content="Отмена" Click="CancelButton_Click" Style="{StaticResource MainButtonStyle}"/>
-        </StackPanel>
+        
     </Grid>
+    
+
 </Window>

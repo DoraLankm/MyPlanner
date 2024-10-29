@@ -32,7 +32,7 @@ namespace MyPlanner
         {
             if (string.IsNullOrWhiteSpace(txtTaskTitle.Text))
             {
-                MessageBox.Show("Пожалуйста, введите название задачи.");
+                MessageBox.Show("Введите название задачи.");
                 return;
             }
 

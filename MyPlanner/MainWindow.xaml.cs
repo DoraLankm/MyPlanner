@@ -25,8 +25,8 @@ namespace MyPlanner
             InitializeComponent();
         }
 
-        private ObservableCollection<Project> Projects = new ObservableCollection<Project>();
-        private ObservableCollection<TaskClass> Tasks = new ObservableCollection<TaskClass>();
+        private List<Project> Projects = new List<Project>();
+        private List<TaskClass> Tasks = new List<TaskClass>();
         private Project selectedProject;
 
         private void AddNoteButton_Click(object sender, RoutedEventArgs e)
@@ -220,13 +220,6 @@ namespace MyPlanner
             Tasks.Clear();
 
             // Загрузка задач, связанных с projectId
-            // Если не используете базу данных, можно добавить тестовые задачи
-            // Например:
-            if (projectId == 1) // Замените на реальные условия
-            {
-                Tasks.Add(new TaskClass { Title = "Задача 1", Description = "Описание задачи 1", CreationDate = DateTime.Now, Deadline = DateTime.Now.AddDays(5), Status = TaskStatus.NotStarted });
-                Tasks.Add(new TaskClass { Title = "Задача 2", Description = "Описание задачи 2", CreationDate = DateTime.Now, Deadline = DateTime.Now.AddDays(10), Status = TaskStatus.InProgress });
-            }
 
             // Обновляем отображение задач
             RefreshTasksDisplay();
@@ -235,7 +228,13 @@ namespace MyPlanner
 
         private void AddTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            //автоматически добавлять строки в таблицу?
+            if (selectedProject == null)
+            {
+                MessageBox.Show("Выберите проект");
+                return;
+            }
+            TaskWindow taskWindow = new TaskWindow();
+            taskWindow.Show();
         }
 
         private void TasksDataGrid_SelectionChanged(object sender, RoutedEventArgs e)

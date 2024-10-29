@@ -42,7 +42,7 @@ namespace MyPlanner
         {
             if (string.IsNullOrWhiteSpace(txtProjectName.Text))
             {
-                MessageBox.Show("Пожалуйста, введите название проекта.");
+                MessageBox.Show("Название проекта не может быть пустым!");
                 txtProjectName.Focus();
                 return;
             }
