@@ -19,6 +19,10 @@ namespace MyPlanner
     /// </summary>
     public partial class MainWindow : Window
     {
+        Project selectedProject;
+        TaskClass selectedTask;
+        User User;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -77,7 +81,28 @@ namespace MyPlanner
 
         private void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
+
             //автоматически создавать новый квадратик
+
+            Border projectSquare = new Border
+            {
+                Width = 150,
+                Height = 150,
+
+
+                Child = new StackPanel
+                {
+                    Children =
+                    {
+                        new Label
+                        {
+                            Content =  "Название проекта"
+                        },
+                        
+                    }
+                }
+            };
+            ProjectsPanel.Children.Add(projectSquare);
         }
 
         private void AddTaskButton_Click(object sender, RoutedEventArgs e)
