@@ -72,6 +72,7 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
         </Style>
+        
     </Window.Resources>
 
     <!-- Главное окно -->
@@ -138,7 +139,7 @@
 
                     <!-- Добавлен ScrollViewer -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0">
-                        <WrapPanel x:Name="ProjectsPanel">
+                        <WrapPanel x:Name="ProjectsPanel" Margin="5" HorizontalAlignment="Center">
                         </WrapPanel>
                     </ScrollViewer>
 
@@ -165,8 +166,8 @@
 
                 <!-- Описание выбранного проекта -->
                 <StackPanel Grid.Row="0" Margin="0,5,0,5">
-                    <TextBlock Text="Выберите проект" FontWeight="Bold" FontSize="16" Margin="5" Foreground="{StaticResource Color1}"/>
-                    <TextBlock  Margin="5"/>
+                    <TextBlock  x:Name="txtProjectTitle" Text="Выберите проект" FontWeight="Bold" FontSize="16" Margin="5" Foreground="{StaticResource Color1}"/>
+                    <TextBlock Name="txtProjectDescription" Margin="5"/>
                 </StackPanel>
 
                

@@ -26,9 +26,15 @@ namespace MyPlanner
         {
             InitializeComponent();
 
-            // Установим значения по умолчанию
-            cbPriority.SelectedIndex = 0;
-            cbCategory.SelectedIndex = 0;
+            // Заполняем ComboBox для приоритета
+            cbPriority.ItemsSource = Enum.GetValues(typeof(Priority)).Cast<Priority>();
+            cbPriority.SelectedItem = Priority.Medium; // Значение по умолчанию
+
+            // Заполняем ComboBox для категории
+            cbCategory.ItemsSource = Enum.GetValues(typeof(Category)).Cast<Category>();
+            cbCategory.SelectedItem = Category.None; // Значение по умолчанию
+
+            // Устанавливаем дату дедлайна по умолчанию
             dpDeadline.SelectedDate = DateTime.Now.AddDays(7);
         }
 
@@ -37,6 +43,7 @@ namespace MyPlanner
             if (string.IsNullOrWhiteSpace(txtProjectName.Text))
             {
                 MessageBox.Show("Пожалуйста, введите название проекта.");
+                txtProjectName.Focus();
                 return;
             }
 
@@ -46,8 +53,8 @@ namespace MyPlanner
                 Name = txtProjectName.Text,
                 Description = txtProjectDescription.Text,
                 Deadline = dpDeadline.SelectedDate ?? DateTime.Now.AddDays(7),
-                Priority = (Priority)Enum.Parse(typeof(Priority), ((ComboBoxItem)cbPriority.SelectedItem).Content.ToString()),
-                Category = (Category)Enum.Parse(typeof(Category), ((ComboBoxItem)cbCategory.SelectedItem).Content.ToString()),
+                Priority = (Priority)cbPriority.SelectedItem,
+                Category = (Category)cbCategory.SelectedItem,
                 CreationDate = DateTime.Now,
                 IsCompleted = false
             };
