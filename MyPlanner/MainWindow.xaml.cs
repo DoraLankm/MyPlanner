@@ -21,108 +21,110 @@ namespace MyPlanner
     /// </summary>
     public partial class MainWindow : Window
     {
+        User User; //авторизованный пользователь 
+        private Project selectedProject; //выбранный проект
+        private TaskClass selectedTask; //выбранная задача (у активной задачи границы становятся толще)
+
         public MainWindow()
         {
+            User = new User() //имитация пользователя
+            {
+                Id = 1,
+                Name = "Me"
+            };
             InitializeComponent();
-            //cbStatus.ItemsSource = Enum.GetValues(typeof(TaskStatus)).Cast<TaskStatus>().ToList();
-            //cbStatus.SelectedItem = TaskStatus.NotStarted; // Значение по умолчанию
         }
     
 
-        private List<Project> Projects = new List<Project>();
-        private List<TaskClass> Tasks = new List<TaskClass>();
-        private Project selectedProject;
-        private TaskClass selectedTask;
+        //private bool IsProjectNameUnique(string projectName) //проверка уникальности имени проекта 
+        //{
+        //    //return !Projects.Any(p => p.Name.Equals(projectName, StringComparison.OrdinalIgnoreCase));
+        //}
 
-        private bool IsProjectNameUnique(string projectName)
-        {
-            return !Projects.Any(p => p.Name.Equals(projectName, StringComparison.OrdinalIgnoreCase));
-        }
+        //private bool IsTaskNameUnique(string taskName, Project project) //проверка уникальности имени задачи 
+        //{
+        //    //return !Tasks.Any(t => t.ProjectId == project.Id && t.Title.Equals(taskName, StringComparison.OrdinalIgnoreCase));
+        //}
 
-        private bool IsTaskNameUnique(string taskName, Project project)
-        {
-            return !Tasks.Any(t => t.ProjectId == project.Id && t.Title.Equals(taskName, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private void AddNoteButton_Click(object sender, RoutedEventArgs e)
+        private void AddNoteButton_Click(object sender, RoutedEventArgs e) //добавить заметку
         {
 
-            if (selectedTask == null)
-            {
-                MessageBox.Show("Задача не выбрана", "Ошибка");
-                return;
-            }
+            //if (selectedTask == null)
+            //{
+            //    MessageBox.Show("Задача не выбрана", "Ошибка");
+            //    return;
+            //}
 
-            string currentDate = DateTime.Now.ToString(); // текущая дата и время
+            //string currentDate = DateTime.Now.ToString(); // текущая дата и время
 
-            // Создаем TextBox для ввода текста новой заметки
-            TextBox noteTextBox = new TextBox
-            {
-                Style = (Style)FindResource("NoteTextBoxStyle")
-            };
+            //// Создаем TextBox для ввода текста новой заметки
+            //TextBox noteTextBox = new TextBox
+            //{
+            //    Style = (Style)FindResource("NoteTextBoxStyle")
+            //};
 
-            noteTextBox.TextChanged += (s, ev) =>
-            {
-                if (noteTextBox.Text.Length > 250)
-                {
-                    noteTextBox.Text = noteTextBox.Text.Substring(0, 250);
-                    noteTextBox.CaretIndex = noteTextBox.Text.Length; // Ставим курсор в конец
-                }
-            };
+            //noteTextBox.TextChanged += (s, ev) =>
+            //{
+            //    if (noteTextBox.Text.Length > 250)
+            //    {
+            //        noteTextBox.Text = noteTextBox.Text.Substring(0, 250);
+            //        noteTextBox.CaretIndex = noteTextBox.Text.Length; // Ставим курсор в конец
+            //    }
+            //};
 
-            // Оформление пузырька заметки
-            Border noteBubble = new Border
-            {
-                Style = (Style)FindResource("ChatBubbleStyle"),
-                Child = new StackPanel
-                {
-                    Children =
-                    {
-                        noteTextBox,
-                        new TextBlock
-                        {
-                            Style = (Style)FindResource("DateTextBlockStyle"),
-                            Text = currentDate
-                        }
-                    }
-                }
-            };
+            //// Оформление пузырька заметки
+            //Border noteBubble = new Border
+            //{
+            //    Style = (Style)FindResource("ChatBubbleStyle"),
+            //    Child = new StackPanel
+            //    {
+            //        Children =
+            //        {
+            //            noteTextBox,
+            //            new TextBlock
+            //            {
+            //                Style = (Style)FindResource("DateTextBlockStyle"),
+            //                Text = currentDate
+            //            }
+            //        }
+            //    }
+            //};
 
-            NotesWrapPanel.Children.Add(noteBubble);
-            noteTextBox.Focus();
-            noteTextBox.LostFocus += (s, ev) =>
-            {
-                if (string.IsNullOrWhiteSpace(noteTextBox.Text))
-                {
-                    // Если текст пустой или состоит только из пробелов, удаляем заметку
-                    NotesWrapPanel.Children.Remove(noteBubble);
-                }
-            };
+            //NotesWrapPanel.Children.Add(noteBubble);
+            //noteTextBox.Focus();
+            //noteTextBox.LostFocus += (s, ev) =>
+            //{
+            //    if (string.IsNullOrWhiteSpace(noteTextBox.Text))
+            //    {
+            //        // Если текст пустой или состоит только из пробелов, удаляем заметку
+            //        NotesWrapPanel.Children.Remove(noteBubble);
+            //    }
+            //};
         }
 
 
 
-        private void AddProjectButton_Click(object sender, RoutedEventArgs e)
+        private void AddProjectButton_Click(object sender, RoutedEventArgs e) //добавить проект 
         {
-            NewProject newProjectWindow = new NewProject();
-            if (newProjectWindow.ShowDialog() == true)
-            {
-                if (!IsProjectNameUnique(newProjectWindow.Project.Name))
-                {
-                    MessageBox.Show("Проект с таким названием уже существует. Пожалуйста, выберите другое название.");
-                    return;
-                }
-                Project newProject = newProjectWindow.Project;
+            //NewProject newProjectWindow = new NewProject();
+            //if (newProjectWindow.ShowDialog() == true)
+            //{
+            //    if (!IsProjectNameUnique(newProjectWindow.Project.Name))
+            //    {
+            //        MessageBox.Show("Проект с таким названием уже существует. Пожалуйста, выберите другое название.");
+            //        return;
+            //    }
+            //    Project newProject = newProjectWindow.Project;
 
-                // Создаем контейнер для проекта с использованием ваших предпочтений
-                Border projectBorder = CreateProjectBorder(newProject);
+            //    // Создаем контейнер для проекта с использованием ваших предпочтений
+            //    Border projectBorder = CreateProjectBorder(newProject);
 
-                // Добавляем проект в WrapPanel
-                ProjectsPanel.Children.Add(projectBorder);
+            //    // Добавляем проект в WrapPanel
+            //    ProjectsPanel.Children.Add(projectBorder);
 
-                // Добавляем проект в коллекцию проектов (если используется)
-                Projects.Add(newProject);
-            }
+            //    // Добавляем проект в коллекцию проектов (если используется)
+            //    Projects.Add(newProject);
+            //}
         }
 
         private Border CreateProjectBorder(Project project)
@@ -236,83 +238,59 @@ namespace MyPlanner
             txtProjectDescription.Text = project.Description;
         }
 
-        private void RefreshTasksDisplay()
-        {
-            TasksDataGrid.ItemsSource = null;
-            TasksDataGrid.ItemsSource = Tasks;
-        }
+       
 
 
         private void LoadTasks(int projectId)
         {
-            // Очищаем список задач
-            Tasks.Clear();
+            //// Очищаем список задач
+            //Tasks.Clear();
 
-            // Загрузка задач, связанных с projectId
+            //// Загрузка задач, связанных с projectId
 
-            // Обновляем отображение задач
-            RefreshTasksDisplay();
+            //// Обновляем отображение задач
+            //RefreshTasksDisplay();
         }
 
-        public static List<TaskStatus> GetAvailableStatuses()
+
+
+        private void AddTaskButton_Click(object sender, RoutedEventArgs e) //добавить задачу 
         {
-            return Enum.GetValues(typeof(TaskStatus)).Cast<TaskStatus>().ToList();
-        }
+            //if (selectedProject == null)
+            //{
+            //    MessageBox.Show("Проект не выбран!");
+            //    return;
+            //}
 
+            //TaskWindow taskWindow = new TaskWindow();
+            //if (taskWindow.ShowDialog() == true)
+            //{
+            //    bool isTaskTitleUnique = !Tasks.Any(t => t.Title == taskWindow.NewTask.Title && t.ProjectId == selectedProject.Id);
+            //    if (!isTaskTitleUnique)
+            //    {
+            //        MessageBox.Show("Задача с заданным именем уже существует!");
+            //        return;
+            //    }
 
-        private void AddTaskButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (selectedProject == null)
-            {
-                MessageBox.Show("Проект не выбран!");
-                return;
-            }
-
-            TaskWindow taskWindow = new TaskWindow();
-            if (taskWindow.ShowDialog() == true)
-            {
-                bool isTaskTitleUnique = !Tasks.Any(t => t.Title == taskWindow.NewTask.Title && t.ProjectId == selectedProject.Id);
-                if (!isTaskTitleUnique)
-                {
-                    MessageBox.Show("Задача с заданным именем уже существует!");
-                    return;
-                }
-
-                TaskClass newTask = taskWindow.NewTask;
-                newTask.ProjectId = selectedProject.Id; // Связываем задачу с выбранным проектом
-                Tasks.Add(newTask); // Добавляем задачу в коллекцию
-                RefreshTasksDisplay(); // Обновляем таблицу
-            }
+            //    TaskClass newTask = taskWindow.NewTask;
+            //    newTask.ProjectId = selectedProject.Id; // Связываем задачу с выбранным проектом
+            //    Tasks.Add(newTask); // Добавляем задачу в коллекцию
+            //    RefreshTasksDisplay(); // Обновляем таблицу
+            //}
         }
 
 
 
 
-        private void TasksDataGrid_SelectionChanged(object sender, RoutedEventArgs e)
+        private void TasksDataGrid_SelectionChanged(object sender, RoutedEventArgs e) //изменение выбранной задачи
         {
             selectedTask = (TaskClass)TasksDataGrid.SelectedItem;
         }
 
-        private void UpdateTaskStatus(TaskClass task, TaskStatus newStatus)
-        {
-            if (task != null)
-            {
-                task.Status = newStatus;
-                RefreshTasksDisplay();
-            }
 
-        }
 
         // Пример использования ComboBox для изменения статуса
-        private void StatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (selectedTask != null && sender is ComboBox comboBox)
-            {
-                // Получаем новый статус из ComboBox
-                var selectedStatus = (TaskStatus)comboBox.SelectedItem;
-                UpdateTaskStatus(selectedTask, selectedStatus);
-            }
-        }
+        
 
     }
 }

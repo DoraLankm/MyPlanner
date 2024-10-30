@@ -206,11 +206,11 @@
                         <!-- Таблица задач -->
                         <DataGrid x:Name="TasksDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,0,0,5" CanUserAddRows="False" IsReadOnly="True" SelectionChanged="TasksDataGrid_SelectionChanged">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Название задачи" Binding="{Binding TaskName}" Width="2*" />
-                                <DataGridTextColumn Header="Описание задачи" Binding="{Binding TaskDescription}" Width="3*" />
-                                <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate}" Width="*" />
-                                <DataGridTextColumn Header="Дедлайн" Binding="{Binding Deadline}" Width="*" />
-                                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*" />
+                                <DataGridTextColumn Header="Название задачи" Width="2*" />
+                                <DataGridTextColumn Header="Описание задачи" Width="3*" />
+                                <DataGridTextColumn Header="Дата создания" Width="*" />
+                                <DataGridTextColumn Header="Дедлайн" Width="*" />
+                                <DataGridComboBoxColumn Header="Статус" Width="*" />
                             </DataGrid.Columns>
                         </DataGrid>
 
