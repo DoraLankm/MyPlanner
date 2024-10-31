@@ -324,85 +324,10 @@ namespace MyPlanner
             LoadNotes(selectedTask);
         }
 
-        private void TasksDataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            isEditingTask = true;
-        }
+       
+       
 
-        private void TasksDataGrid_CurrentCellChanged(object sender, EventArgs e)
-        {
-            if (TasksDataGrid.CurrentItem is TaskClass editedTask)
-            {
-                // Получаем текущую ячейку и проверяем, какой столбец редактируется
-                var column = TasksDataGrid.CurrentCell.Column;
-                if (column != null)
-                {
-                    string header = column.Header.ToString();
-
-                    if (header == "Название задачи")
-                    {
-                        // Проверяем уникальность названия задачи
-                        if (!IsTaskNameUnique(editedTask.Title))
-                        {
-                            MessageBox.Show("Название задачи должно быть уникальным.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                            editedTask.Title = string.Empty; // Очищаем поле, если оно не уникально
-                            return;
-                        }
-                    }
-                    else if (header == "Описание задачи")
-                    {
-                        // Ограничиваем длину описания задачи
-                        if (editedTask.Description != null && editedTask.Description.Length > 300)
-                        {
-                            MessageBox.Show("Описание задачи не должно превышать 300 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                            editedTask.Description = editedTask.Description.Substring(0, 300); // Обрезаем текст до 300 символов
-                        }
-                    }
-
-                    // Сохраняем изменения
-                    SaveChangesToTasks();
-                }
-            }
-        }
-
-        private void TasksDataGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
-        {
-            // Проверяем, действительно ли была редактируемая операция
-            if (isEditingTask && e.Row.Item is TaskClass editedTask)
-            {
-                isEditingTask = false; // Сбрасываем флаг, так как редактирование завершено
-
-                // Проверяем уникальность названия задачи, если изменяется Title
-                if (!IsTaskNameUnique(editedTask.Title))
-                {
-                    MessageBox.Show("Название задачи должно быть уникальным.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    editedTask.Title = string.Empty; // Сбрасываем значение, если не уникально
-                    return;
-                }
-
-                // Проверяем длину описания, если оно изменяется
-                if (editedTask.Description != null && editedTask.Description.Length > 300)
-                {
-                    MessageBox.Show("Описание задачи не должно превышать 300 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    editedTask.Description = editedTask.Description.Substring(0, 300); // Обрезаем до 300 символов
-                }
-
-                // Даем завершить редактирование строки перед обновлением
-                TasksDataGrid.Dispatcher.InvokeAsync(() =>
-                {
-                    SaveChangesToTasks();
-                    TasksDataGrid.Items.Refresh(); // Обновляем интерфейс
-                }, System.Windows.Threading.DispatcherPriority.Background);
-            }
-        }
-
-
-
-        private void SaveChangesToTasks()
-        {
-            
-            TasksDataGrid.Items.Refresh(); // Обновляем отображение в DataGrid
-        }
+    
         private Border CreateNoteBubble(Note note)
         {
             // Текст заметки, здесь используем TextBlock, без стиля NoteTextBoxStyle
@@ -447,6 +372,99 @@ namespace MyPlanner
                 }
             }
         }
+
+        private void EditTask_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedTask != null)
+            {
+                TaskWindow editTaskWindow = new TaskWindow(selectedTask); // Открываем окно редактирования задачи
+                if (editTaskWindow.ShowDialog() == true)
+                {
+                    LoadTasks(selectedProject); // Обновляем список задач после редактирования
+                }
+            }
+        }
+
+        private void DeleteTask_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedTask != null && selectedProject != null)
+            {
+                var result = MessageBox.Show("Вы действительно хотите удалить задачу?", "Подтверждение удаления", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    selectedProject.Tasks.Remove(selectedTask); // Удаляем задачу из списка
+                    selectedTask = null;
+                    LoadTasks(selectedProject); // Обновляем таблицу задач
+                }
+            }
+        }
+
+        private void EditProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedProject != null)
+            {
+                NewProject editProjectWindow = new NewProject(selectedProject); // Открываем окно редактирования проекта
+                if (editProjectWindow.ShowDialog() == true)
+                {
+                    DisplayProjectDetails(selectedProject); // Обновляем детали проекта
+                }
+            }
+        }
+
+        private void DeleteProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedProject != null)
+            {
+                var result = MessageBox.Show("Вы действительно хотите удалить проект?", "Подтверждение удаления", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    User.Projects.Remove(selectedProject); // Удаляем проект из списка
+                    ProjectsPanel.Children.Clear(); // Обновляем панель проектов
+                    foreach (var project in User.Projects)
+                    {
+                        ProjectsPanel.Children.Add(CreateProjectBorder(project));
+                    }
+                    selectedProject = null;
+                }
+            }
+        }
+
+        private void EditNote_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedTask != null && selectedTask.Notes != null && selectedTask.Notes.Count > 0)
+            {
+                var note = selectedTask.Notes.Last(); // Пример: редактируем последнюю заметку
+                TextBox noteTextBox = new TextBox
+                {
+                    Text = note.Content,
+                    AcceptsReturn = true,
+                    MaxLength = 250,
+                    Width = 300
+                };
+
+                var result = MessageBox.Show(noteTextBox, "Редактировать заметку", MessageBoxButton.OKCancel);
+                if (result == MessageBoxResult.OK)
+                {
+                    note.Content = noteTextBox.Text;
+                    LoadNotes(selectedTask); // Обновляем список заметок
+                }
+            }
+        }
+
+        private void DeleteNote_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedTask != null && selectedTask.Notes != null && selectedTask.Notes.Count > 0)
+            {
+                var note = selectedTask.Notes.Last(); // Пример: удаляем последнюю заметку
+                var result = MessageBox.Show("Вы действительно хотите удалить заметку?", "Подтверждение удаления", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    selectedTask.Notes.Remove(note);
+                    LoadNotes(selectedTask); // Обновляем список заметок
+                }
+            }
+        }
+
 
 
     }

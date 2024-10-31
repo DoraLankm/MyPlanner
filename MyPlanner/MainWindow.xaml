@@ -222,6 +222,12 @@
                     <!-- Добавлен ScrollViewer -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0">
                         <WrapPanel x:Name="ProjectsPanel" Margin="5" HorizontalAlignment="Center">
+                            <WrapPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Редактировать проект" Click="EditProject_Click" />
+                                    <MenuItem Header="Удалить проект" Click="DeleteProject_Click" />
+                                </ContextMenu>
+                            </WrapPanel.ContextMenu>
                         </WrapPanel>
                     </ScrollViewer>
 
@@ -287,10 +293,9 @@
 
 
                         <!-- DataGrid с новым стилем -->
-                        <DataGrid x:Name="TasksDataGrid" Grid.Row="1" Style="{StaticResource CustomDataGridStyle}" AutoGenerateColumns="False" Margin="0"
-                        CanUserAddRows="False" IsReadOnly="False" SelectionChanged="TasksDataGrid_SelectionChanged"
-                        ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch"
-                        BeginningEdit="TasksDataGrid_BeginningEdit" CurrentCellChanged="TasksDataGrid_CurrentCellChanged" RowEditEnding="TasksDataGrid_RowEditEnding">
+                        <DataGrid x:Name="TasksDataGrid" Grid.Row="1" IsReadOnly="True" Style="{StaticResource CustomDataGridStyle}" AutoGenerateColumns="False" Margin="0"
+                        CanUserAddRows="False" SelectionChanged="TasksDataGrid_SelectionChanged"
+                        ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch">
                             <!-- Колонки таблицы остаются прежними -->
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Название задачи" Binding="{Binding Title}" Width="2*" />
@@ -322,6 +327,13 @@
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
+
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Редактировать задачу" Click="EditTask_Click" />
+                                    <MenuItem Header="Удалить задачу" Click="DeleteTask_Click" />
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
                         </DataGrid>
 
                         <!-- Кнопка добавления задачи -->
@@ -342,7 +354,14 @@
 
                         <!-- Область заметок с скроллбаром -->
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0">
-                            <WrapPanel x:Name="NotesWrapPanel" HorizontalAlignment="Left" Orientation="Horizontal" ItemWidth="440" Cursor=""/>
+                            <WrapPanel x:Name="NotesWrapPanel" HorizontalAlignment="Left" Orientation="Horizontal" ItemWidth="440" Cursor="">
+                                <WrapPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Редактировать заметку" Click="EditNote_Click" />
+                                        <MenuItem Header="Удалить заметку" Click="DeleteNote_Click" />
+                                    </ContextMenu>
+                                </WrapPanel.ContextMenu>
+                            </WrapPanel>
                         </ScrollViewer>
 
                         <!-- Кнопка для добавления новой заметки -->
