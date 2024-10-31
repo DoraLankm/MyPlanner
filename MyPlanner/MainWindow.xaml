@@ -84,6 +84,77 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
+
+
+
+
+        <Style x:Key="CustomDataGridStyle" TargetType="DataGrid">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <!-- Увеличенный шрифт -->
+            <Setter Property="RowHeight" Value="35"/>
+            <!-- Увеличенная высота строки -->
+            <Setter Property="Foreground" Value="{StaticResource Color1}"/>
+            <!-- Цвет текста -->
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <!-- Цвет рамки -->
+            <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource Color2}"/>
+            <!-- Цвет горизонтальных линий -->
+            <Setter Property="VerticalGridLinesBrush" Value="{StaticResource Color2}"/>
+            <!-- Цвет вертикальных линий -->
+
+            <!-- Стиль для строк -->
+            <Setter Property="AlternationCount" Value="2"/>
+            <Setter Property="AlternatingRowBackground" Value="{StaticResource Color4}"/>
+            <!-- Цвет для чередующихся строк -->
+            <Setter Property="RowBackground" Value="{StaticResource Color4}"/>
+            <!-- Цвет для обычных строк -->
+
+            <!-- Стиль для заголовков -->
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="{StaticResource Color2}"/>
+                        <!-- Цвет заголовка -->
+                        <Setter Property="Foreground" Value="White"/>
+                        <!-- Цвет текста заголовка -->
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="10,5"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource Color2}"/>
+                        <!-- Цвет рамки заголовка -->
+                        <Setter Property="BorderThickness" Value="1,0,1,1"/>
+                        <!-- Разделитель снизу -->
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+
+            <!-- Стиль для выделенной строки -->
+            <Setter Property="CellStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Background" Value="{StaticResource Color4}"/>
+                        <!-- Цвет фона ячейки -->
+                        <Setter Property="Foreground" Value="{StaticResource Color1}"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <!-- Цвет текста ячейки -->
+                        <Setter Property="FontSize" Value="14"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{StaticResource Color3}"/>
+                                <!-- Цвет выделенной строки -->
+                                <Setter Property="Foreground" Value="White"/>
+                                <!-- Цвет текста выделенной строки -->
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <!-- Главное окно -->
@@ -194,7 +265,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Таблица задач с скроллбаром -->
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="0" Cursor="">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <!-- Кнопки задач -->
@@ -213,23 +284,18 @@
                             <RadioButton x:Name="rbActiveTasks" Content="Активные задачи" GroupName="TasksView" IsChecked="True" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="0" />
                             <RadioButton x:Name="rbCompletedTasks" Content="Выполненные задачи" GroupName="TasksView" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="1" />
                         </Grid>
-                        
 
-                        <!-- Таблица задач -->
-                        <DataGrid x:Name="TasksDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0" CanUserAddRows="False" IsReadOnly="False" SelectionChanged="TasksDataGrid_SelectionChanged"
-                              ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
 
+                        <!-- DataGrid с новым стилем -->
+                        <DataGrid x:Name="TasksDataGrid" Grid.Row="1" Style="{StaticResource CustomDataGridStyle}" AutoGenerateColumns="False" Margin="0"
+                        CanUserAddRows="False" IsReadOnly="False" SelectionChanged="TasksDataGrid_SelectionChanged"
+                        ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch"
+                        BeginningEdit="TasksDataGrid_BeginningEdit" CurrentCellChanged="TasksDataGrid_CurrentCellChanged" RowEditEnding="TasksDataGrid_RowEditEnding">
+                            <!-- Колонки таблицы остаются прежними -->
                             <DataGrid.Columns>
-                                <!-- Название задачи -->
                                 <DataGridTextColumn Header="Название задачи" Binding="{Binding Title}" Width="2*" />
-
-                                <!-- Описание задачи -->
                                 <DataGridTextColumn Header="Описание задачи" Binding="{Binding Description}" Width="3*" />
-
-                                <!-- Дата создания -->
                                 <DataGridTextColumn Header="Дата создания" Binding="{Binding CreationDate, StringFormat=\{0:dd.MM.yyyy\}}" Width="*" IsReadOnly="True"/>
-
-                                <!-- Дедлайн с использованием DatePicker -->
                                 <DataGridTemplateColumn Header="Дедлайн" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -242,8 +308,6 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
-
-                                <!-- Статус задачи с использованием ComboBox -->
                                 <DataGridTemplateColumn Header="Статус" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -253,12 +317,11 @@
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
                                             <ComboBox SelectedItem="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                            ItemsSource="{Binding Source={StaticResource TaskStatusEnumSource}}" />
+                              ItemsSource="{Binding Source={StaticResource TaskStatusEnumSource}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
-
                         </DataGrid>
 
                         <!-- Кнопка добавления задачи -->

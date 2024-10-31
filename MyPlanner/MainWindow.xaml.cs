@@ -21,6 +21,8 @@ namespace MyPlanner
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool isEditingTask = false;
+
         User User; //авторизованный пользователь 
         private Project selectedProject; //выбранный проект
         private TaskClass selectedTask; //выбранная задача (у активной задачи границы становятся толще)
@@ -38,21 +40,42 @@ namespace MyPlanner
         bool IsProjectNameUnique(string name)
         {
 
+            foreach (var project in User.Projects)
+            {
+                if (project.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
-        private void AddNoteButton_Click(object sender, RoutedEventArgs e) //добавить заметку
+        bool IsTaskNameUnique(string name)
         {
 
+            foreach (var task in selectedProject.Tasks)
+            {
+                if (task.Title.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void AddNoteButton_Click(object sender, RoutedEventArgs e)
+        {
             if (selectedTask == null)
             {
                 MessageBox.Show("Задача не выбрана", "Ошибка");
                 return;
             }
 
-            string currentDate = DateTime.Now.ToString(); // текущая дата и время
+            DateTime currentDate = DateTime.Now;
 
-            // Создаем TextBox для ввода текста новой заметки
+            // Создаем TextBox для ввода новой заметки
             TextBox noteTextBox = new TextBox
             {
                 Style = (Style)FindResource("NoteTextBoxStyle")
@@ -63,41 +86,68 @@ namespace MyPlanner
                 if (noteTextBox.Text.Length > 250)
                 {
                     noteTextBox.Text = noteTextBox.Text.Substring(0, 250);
-                    noteTextBox.CaretIndex = noteTextBox.Text.Length; // Ставим курсор в конец
+                    noteTextBox.CaretIndex = noteTextBox.Text.Length;
                 }
             };
 
-            // Оформление пузырька заметки
-            Border noteBubble = new Border
+            // Пузырек для новой заметки, пока она вводится
+            Border tempNoteBubble = new Border
             {
                 Style = (Style)FindResource("ChatBubbleStyle"),
                 Child = new StackPanel
                 {
                     Children =
-                    {
-                        noteTextBox,
-                        new TextBlock
-                        {
-                            Style = (Style)FindResource("DateTextBlockStyle"),
-                            Text = currentDate
-                        }
-                    }
+            {
+                noteTextBox,
+                new TextBlock
+                {
+                    Style = (Style)FindResource("DateTextBlockStyle"),
+                    Text = currentDate.ToString()
+                }
+            }
                 }
             };
 
-            NotesWrapPanel.Children.Add(noteBubble);
+            NotesWrapPanel.Children.Add(tempNoteBubble);
             noteTextBox.Focus();
+
             noteTextBox.LostFocus += (s, ev) =>
             {
                 if (string.IsNullOrWhiteSpace(noteTextBox.Text))
                 {
-                    // Если текст пустой или состоит только из пробелов, удаляем заметку
-                    NotesWrapPanel.Children.Remove(noteBubble);
+                    NotesWrapPanel.Children.Remove(tempNoteBubble);
+                }
+                else
+                {
+                    Note newNote = new Note
+                    {
+                        Content = noteTextBox.Text,
+                        CreatedAt = currentDate,
+                    };
+                    selectedTask.Notes.Add(newNote);
+
+                    // Обновляем заметку после сохранения
+                    NotesWrapPanel.Children.Remove(tempNoteBubble);
+                    NotesWrapPanel.Children.Add(CreateNoteBubble(newNote));
                 }
             };
         }
 
 
+        private void LoadNotes(TaskClass task)
+        {
+            // Очищаем панель заметок перед загрузкой новых
+            NotesWrapPanel.Children.Clear();
+
+            if (task == null || task.Notes == null) return;
+
+            foreach (var note in task.Notes)
+            {
+                // Используем метод для создания пузырька заметки
+                Border noteBubble = CreateNoteBubble(note);
+                NotesWrapPanel.Children.Add(noteBubble);
+            }
+        }
 
         private void AddProjectButton_Click(object sender, RoutedEventArgs e) //добавить проект 
         {
@@ -106,7 +156,7 @@ namespace MyPlanner
             {
                 if (!IsProjectNameUnique(newProjectWindow.Project.Name))
                 {
-                    MessageBox.Show("Проект с таким названием уже существует. Пожалуйста, выберите другое название.");
+                    MessageBox.Show("Проект с таким названием уже существует!");
                     return;
                 }
                 Project newProject = newProjectWindow.Project;
@@ -203,10 +253,11 @@ namespace MyPlanner
             // Отображаем детали проекта
             DisplayProjectDetails(selectedProject);
 
-            //// Загружаем задачи проекта
-            //LoadTasks(selectedProject.Id);
+            // Загружаем задачи проекта
+            LoadTasks(selectedProject);
 
             selectedTask = null;
+            NotesWrapPanel.Children.Clear(); //очистка заметок
         }
 
         private void HighlightSelectedProject(Border selectedBorder)
@@ -245,11 +296,17 @@ namespace MyPlanner
             TaskWindow newTaskWindow= new TaskWindow();
             if (newTaskWindow.ShowDialog() == true && newTaskWindow.NewTask != null)
             {
+                if (!IsTaskNameUnique(newTaskWindow.NewTask.Title))
+                {
+                    MessageBox.Show("Задача уже существует!");
+                    return;
+                }
                 // Добавляем задачу в список задач проекта
                 selectedProject.Tasks.Add(newTaskWindow.NewTask);
 
                 // Обновляем DataGrid для отображения новой задачи
                 LoadTasks(selectedProject);
+                TasksDataGrid.Items.Refresh(); // Обновляем DataGrid
             }
         }
 
@@ -264,13 +321,130 @@ namespace MyPlanner
         {
             selectedTask = (TaskClass)TasksDataGrid.SelectedItem;
             HighlightSelectedTask(selectedTask);
+            LoadNotes(selectedTask);
         }
+
+        private void TasksDataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            isEditingTask = true;
+        }
+
+        private void TasksDataGrid_CurrentCellChanged(object sender, EventArgs e)
+        {
+            if (TasksDataGrid.CurrentItem is TaskClass editedTask)
+            {
+                // Получаем текущую ячейку и проверяем, какой столбец редактируется
+                var column = TasksDataGrid.CurrentCell.Column;
+                if (column != null)
+                {
+                    string header = column.Header.ToString();
+
+                    if (header == "Название задачи")
+                    {
+                        // Проверяем уникальность названия задачи
+                        if (!IsTaskNameUnique(editedTask.Title))
+                        {
+                            MessageBox.Show("Название задачи должно быть уникальным.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            editedTask.Title = string.Empty; // Очищаем поле, если оно не уникально
+                            return;
+                        }
+                    }
+                    else if (header == "Описание задачи")
+                    {
+                        // Ограничиваем длину описания задачи
+                        if (editedTask.Description != null && editedTask.Description.Length > 300)
+                        {
+                            MessageBox.Show("Описание задачи не должно превышать 300 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            editedTask.Description = editedTask.Description.Substring(0, 300); // Обрезаем текст до 300 символов
+                        }
+                    }
+
+                    // Сохраняем изменения
+                    SaveChangesToTasks();
+                }
+            }
+        }
+
+        private void TasksDataGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        {
+            // Проверяем, действительно ли была редактируемая операция
+            if (isEditingTask && e.Row.Item is TaskClass editedTask)
+            {
+                isEditingTask = false; // Сбрасываем флаг, так как редактирование завершено
+
+                // Проверяем уникальность названия задачи, если изменяется Title
+                if (!IsTaskNameUnique(editedTask.Title))
+                {
+                    MessageBox.Show("Название задачи должно быть уникальным.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    editedTask.Title = string.Empty; // Сбрасываем значение, если не уникально
+                    return;
+                }
+
+                // Проверяем длину описания, если оно изменяется
+                if (editedTask.Description != null && editedTask.Description.Length > 300)
+                {
+                    MessageBox.Show("Описание задачи не должно превышать 300 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    editedTask.Description = editedTask.Description.Substring(0, 300); // Обрезаем до 300 символов
+                }
+
+                // Даем завершить редактирование строки перед обновлением
+                TasksDataGrid.Dispatcher.InvokeAsync(() =>
+                {
+                    SaveChangesToTasks();
+                    TasksDataGrid.Items.Refresh(); // Обновляем интерфейс
+                }, System.Windows.Threading.DispatcherPriority.Background);
+            }
+        }
+
+
+
+        private void SaveChangesToTasks()
+        {
+            
+            TasksDataGrid.Items.Refresh(); // Обновляем отображение в DataGrid
+        }
+        private Border CreateNoteBubble(Note note)
+        {
+            // Текст заметки, здесь используем TextBlock, без стиля NoteTextBoxStyle
+            TextBlock noteTextBlock = new TextBlock
+            {
+                Text = note.Content,
+                TextWrapping = TextWrapping.Wrap // добавим перенос текста, если нужно
+            };
+
+            // Дата создания заметки
+            TextBlock dateTextBlock = new TextBlock
+            {
+                Text = note.CreatedAt.ToString(),
+                Style = (Style)FindResource("DateTextBlockStyle")
+            };
+
+            // Создаем пузырек заметки
+            Border noteBubble = new Border
+            {
+                Style = (Style)FindResource("ChatBubbleStyle"),
+                Child = new StackPanel
+                {
+                    Children = { noteTextBlock, dateTextBlock }
+                }
+            };
+
+            return noteBubble;
+        }
+
 
         private void HighlightSelectedTask(TaskClass task)
         {
             if (task != null)
             {
-                // Можно добавить дополнительную логику для отображения деталей задачи или других действий
+                foreach (var item in TasksDataGrid.Items)
+                {
+                    var row = TasksDataGrid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
+                    if (row != null)
+                    {
+                        row.Background = item == task ? Brushes.LightBlue : Brushes.White;
+                    }
+                }
             }
         }
 
