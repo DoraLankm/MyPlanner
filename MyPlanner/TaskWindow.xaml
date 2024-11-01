@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MyPlanner"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:MyPlanner.Models"
         mc:Ignorable="d"
-        Title="Создание задачи" Height="370" Width="400"
+        Title="Сохранение задачи" Height="400" Width="400"
         ResizeMode="NoResize">
 
     <Window.Resources>
@@ -52,6 +53,13 @@
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Margin" Value="0,0,0,2"/>
         </Style>
+
+        <!-- Источник данных для TaskStatus -->
+        <ObjectDataProvider x:Key="TaskStatusEnumSource" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:TaskStatus" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
 
     <Grid Background="{StaticResource Color2}">
@@ -70,9 +78,13 @@
                 <Label Content="Дедлайн:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
                 <DatePicker x:Name="dpTaskDeadline" HorizontalAlignment="Stretch" Foreground="Black"/>
 
+                <Label Content="Статус задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <ComboBox x:Name="cbTaskStatus" HorizontalAlignment="Stretch" Foreground="Black"  
+                ItemsSource="{Binding Source={StaticResource TaskStatusEnumSource}}"/>
+
                 <!-- Кнопки -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Создать" Click="CreateButton_Click" Style="{StaticResource MainButtonStyle}" />
+                    <Button Content="Сохранить" Click="CreateButton_Click" Style="{StaticResource MainButtonStyle}" />
                     <Button Content="Отмена" Click="CancelButton_Click" Style="{StaticResource MainButtonStyle}"/>
                 </StackPanel>
             </StackPanel>

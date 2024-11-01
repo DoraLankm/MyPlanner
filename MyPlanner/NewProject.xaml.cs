@@ -20,22 +20,33 @@ namespace MyPlanner
     /// </summary>
     public partial class NewProject : Window
     {
+        User User { get; set; }
         public Project Project { get; private set; }
+        bool isEditing; //режим редактирования
 
-        public NewProject()
+        public NewProject(User user)
         {
             InitializeComponent();
 
-            // Заполняем ComboBox для приоритета
-            cbPriority.ItemsSource = Enum.GetValues(typeof(Priority)).Cast<Priority>();
             cbPriority.SelectedItem = Priority.Medium; // Значение по умолчанию
-
-            // Заполняем ComboBox для категории
-            cbCategory.ItemsSource = Enum.GetValues(typeof(Category)).Cast<Category>();
             cbCategory.SelectedItem = Category.None; // Значение по умолчанию
+            dpDeadline.SelectedDate = DateTime.Now.AddDays(7); //Значение по умолчанию
+            isEditing = false; //режим создания нового проекта
+            User = user;
+        }
 
-            // Устанавливаем дату дедлайна по умолчанию
-            dpDeadline.SelectedDate = DateTime.Now.AddDays(7);
+        public NewProject(User user,Project project)
+        {
+            InitializeComponent();
+            isEditing = true; //режим редактирования существующего проекта 
+            Project = project;
+            cbCategory.SelectedItem = Project.Category;
+            cbPriority.SelectedItem = Project.Priority;
+            txtProjectName.Text = Project.Name;
+            txtProjectDescription.Text = Project.Description;
+            dpDeadline.SelectedDate = Project.Deadline;
+            User = user;
+
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
@@ -46,18 +57,36 @@ namespace MyPlanner
                 txtProjectName.Focus();
                 return;
             }
-
-            // Создаем новый проект
-            Project = new Project
+            if (!IsProjectNameUnique(txtProjectName.Text))
             {
-                Name = txtProjectName.Text,
-                Description = txtProjectDescription.Text,
-                Deadline = dpDeadline.SelectedDate ?? DateTime.Now.AddDays(7),
-                Priority = (Priority)cbPriority.SelectedItem,
-                Category = (Category)cbCategory.SelectedItem,
-                CreationDate = DateTime.Now,
-                IsCompleted = false
-            };
+                MessageBox.Show("Проект с таким названием уже существует!");
+                return;
+            }
+
+            if (!isEditing) //создание новой задачи
+            {
+                // Создаем новый проект
+                Project = new Project
+                {
+                    Name = txtProjectName.Text,
+                    Description = txtProjectDescription.Text,
+                    Deadline = dpDeadline.SelectedDate ?? DateTime.Now.AddDays(7),
+                    Priority = (Priority)cbPriority.SelectedItem,
+                    Category = (Category)cbCategory.SelectedItem,
+                    CreationDate = DateTime.Now,
+                    IsCompleted = false,
+                    User = User
+                };
+            }
+            else
+            {
+                Project.Name = txtProjectName.Text;
+                Project.Description = txtProjectDescription.Text;
+                Project.Category = (Category)cbCategory.SelectedItem;
+                Project.Priority = (Priority)cbPriority.SelectedItem;
+                Project.Deadline = dpDeadline.SelectedDate ?? DateTime.Now.AddDays(7);
+            }
+                
 
             DialogResult = true;
             Close();
@@ -67,6 +96,23 @@ namespace MyPlanner
         {
             DialogResult = false;
             Close();
+        }
+
+        bool IsProjectNameUnique(string name)
+        {
+            foreach (var project in User.Projects)
+            {
+                if (project.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (isEditing && name == Project.Name) //режим редактирования,назвнаие не изменилось
+                    {
+                        continue;
+                    }
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

@@ -22,29 +22,81 @@ namespace MyPlanner
     public partial class TaskWindow : Window
     {
         public TaskClass NewTask { get; private set; }
-        public TaskWindow()
+        public Project Project { get; private set; }
+        bool isEditing;
+        public TaskWindow(Project selected_project)
         {
             InitializeComponent();
             dpTaskDeadline.SelectedDate = DateTime.Now.AddDays(7);
+            Project = selected_project;
+            isEditing = false;
+            cbTaskStatus.Visibility = Visibility.Hidden;
+        }
+
+        public TaskWindow(Project selected_project,TaskClass selected_task)
+        {
+            InitializeComponent();
+            Project = selected_project;
+            NewTask = selected_task;
+            isEditing = true; //редактировнаие существующей задачи
+            cbTaskStatus.Visibility = Visibility.Visible;
+            txtTaskTitle.Text = NewTask.Title;
+            txtTaskDescription.Text = NewTask.Description;
+            dpTaskDeadline.SelectedDate = NewTask.Deadline;
+            cbTaskStatus.SelectedItem = NewTask.Status;
+        }
+
+        bool IsTaskNameUnique(string name)
+        {
+            foreach (var task in Project.Tasks)
+            {
+                if (task.Title.Equals(name, StringComparison.OrdinalIgnoreCase)) 
+                {
+                    if (isEditing && name == NewTask.Title) //режим редактирования,назвнаие не изменилось
+                    {
+                        continue;
+                    }
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTaskTitle.Text))
             {
-                MessageBox.Show("Введите название задачи.");
+                MessageBox.Show("Название задачи не может быть пустым!");
+                return;
+            }
+            if (!IsTaskNameUnique(txtTaskTitle.Text))
+            {
+                MessageBox.Show("Задача уже существует!");
                 return;
             }
 
-            // Создаем новую задачу
-            NewTask = new TaskClass
+            if (!isEditing) //создание новой задачи
             {
-                Title = txtTaskTitle.Text,
-                Description = txtTaskDescription.Text,
-                Deadline = dpTaskDeadline.SelectedDate ?? DateTime.Now.AddDays(7),
-                CreationDate = DateTime.Now,
-                Status = TaskStatus.NotStarted
-            };
+                // Создаем новую задачу
+                NewTask = new TaskClass
+                {
+                    Title = txtTaskTitle.Text,
+                    Description = txtTaskDescription.Text,
+                    Deadline = dpTaskDeadline.SelectedDate ?? DateTime.Now.AddDays(7),
+                    CreationDate = DateTime.Now,
+                    Status = TaskStatus.NotStarted,
+                    ProjectId = Project.Id
+
+                };
+            }
+            else //редактирование существующей
+            {
+                NewTask.Title = txtTaskTitle.Text;
+                NewTask.Description = txtTaskDescription.Text;
+                NewTask.Deadline = dpTaskDeadline.SelectedDate ?? DateTime.Now.AddDays(7);
+                NewTask.Status = (TaskStatus)cbTaskStatus.SelectedItem;
+            }
 
             DialogResult = true;
             Close();

@@ -97,7 +97,7 @@
             <Setter Property="Foreground" Value="{StaticResource Color1}"/>
             <!-- Цвет текста -->
             <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderBrush" Value="White"/>
             <!-- Цвет рамки -->
             <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource Color2}"/>
             <!-- Цвет горизонтальных линий -->
@@ -357,7 +357,6 @@
                             <WrapPanel x:Name="NotesWrapPanel" HorizontalAlignment="Left" Orientation="Horizontal" ItemWidth="440" Cursor="">
                                 <WrapPanel.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Редактировать заметку" Click="EditNote_Click" />
                                         <MenuItem Header="Удалить заметку" Click="DeleteNote_Click" />
                                     </ContextMenu>
                                 </WrapPanel.ContextMenu>

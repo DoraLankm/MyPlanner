@@ -37,33 +37,9 @@ namespace MyPlanner
             InitializeComponent();
         }
 
-        bool IsProjectNameUnique(string name)
-        {
+        
 
-            foreach (var project in User.Projects)
-            {
-                if (project.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        bool IsTaskNameUnique(string name)
-        {
-
-            foreach (var task in selectedProject.Tasks)
-            {
-                if (task.Title.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+ 
 
         private void AddNoteButton_Click(object sender, RoutedEventArgs e)
         {
@@ -98,8 +74,8 @@ namespace MyPlanner
                 {
                     Children =
             {
-                noteTextBox,
-                new TextBlock
+                    noteTextBox,
+                    new TextBlock
                 {
                     Style = (Style)FindResource("DateTextBlockStyle"),
                     Text = currentDate.ToString()
@@ -123,6 +99,8 @@ namespace MyPlanner
                     {
                         Content = noteTextBox.Text,
                         CreatedAt = currentDate,
+                        UserId = User.Id,
+                        TaskId = selectedTask.Id
                     };
                     selectedTask.Notes.Add(newNote);
 
@@ -151,14 +129,10 @@ namespace MyPlanner
 
         private void AddProjectButton_Click(object sender, RoutedEventArgs e) //добавить проект 
         {
-            NewProject newProjectWindow = new NewProject();
+            NewProject newProjectWindow = new NewProject(User);
             if (newProjectWindow.ShowDialog() == true)
             {
-                if (!IsProjectNameUnique(newProjectWindow.Project.Name))
-                {
-                    MessageBox.Show("Проект с таким названием уже существует!");
-                    return;
-                }
+
                 Project newProject = newProjectWindow.Project;
 
                 // Создаем контейнер для проекта 
@@ -242,22 +216,46 @@ namespace MyPlanner
         private void ProjectBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var selectedBorder = sender as Border;
-            var selectedProject = selectedBorder.Tag as Project;
+            var selected_Project = selectedBorder.Tag as Project;
 
-            // Сохраняем выбранный проект
-            this.selectedProject = selectedProject;
+            // Проверка, чтобы сбрасывать задачу только при выборе другого проекта
+            if (this.selectedProject != selected_Project)
+            {
+                // Сохраняем новый выбранный проект
+                this.selectedProject = selected_Project;
 
-            // Выделяем выбранный проект
-            HighlightSelectedProject(selectedBorder);
+                // Сбрасываем выбранную задачу
+                selectedTask = null;
 
-            // Отображаем детали проекта
-            DisplayProjectDetails(selectedProject);
+                // Сбрасываем цвет выделения всех строк в таблице задач
+                ResetTaskSelection();
 
-            // Загружаем задачи проекта
-            LoadTasks(selectedProject);
+                // Очищаем заметки, так как задача сброшена
+                NotesWrapPanel.Children.Clear();
 
-            selectedTask = null;
-            NotesWrapPanel.Children.Clear(); //очистка заметок
+                // Выделяем выбранный проект
+                HighlightSelectedProject(selectedBorder);
+
+                // Отображаем детали нового проекта
+                DisplayProjectDetails(selected_Project);
+
+                // Загружаем задачи для выбранного проекта
+                LoadTasks(selected_Project);
+            }
+
+          
+        }
+
+        private void ResetTaskSelection()
+        {
+            // Сбрасываем цвет фона для всех строк в DataGrid
+            foreach (var item in TasksDataGrid.Items)
+            {
+                if (TasksDataGrid.ItemContainerGenerator.ContainerFromItem(item) is DataGridRow row)
+                {
+                    row.Background = Brushes.White; // Устанавливаем стандартный белый фон
+                }
+            }
         }
 
         private void HighlightSelectedProject(Border selectedBorder)
@@ -293,14 +291,10 @@ namespace MyPlanner
                 MessageBox.Show("Проект не выбран", "Ошибка");
                 return;
             }
-            TaskWindow newTaskWindow= new TaskWindow();
+            TaskWindow newTaskWindow= new TaskWindow(selectedProject);
             if (newTaskWindow.ShowDialog() == true && newTaskWindow.NewTask != null)
             {
-                if (!IsTaskNameUnique(newTaskWindow.NewTask.Title))
-                {
-                    MessageBox.Show("Задача уже существует!");
-                    return;
-                }
+             
                 // Добавляем задачу в список задач проекта
                 selectedProject.Tasks.Add(newTaskWindow.NewTask);
 
@@ -314,6 +308,8 @@ namespace MyPlanner
         {
             // Устанавливаем задачи выбранного проекта как источник данных для DataGrid
             TasksDataGrid.ItemsSource = project.Tasks;
+            // Обновляем отображение
+            TasksDataGrid.Items.Refresh();
         }
 
 
@@ -377,7 +373,7 @@ namespace MyPlanner
         {
             if (selectedTask != null)
             {
-                TaskWindow editTaskWindow = new TaskWindow(selectedTask); // Открываем окно редактирования задачи
+                TaskWindow editTaskWindow = new TaskWindow(selectedProject,selectedTask); // Открываем окно редактирования задачи
                 if (editTaskWindow.ShowDialog() == true)
                 {
                     LoadTasks(selectedProject); // Обновляем список задач после редактирования
@@ -403,7 +399,7 @@ namespace MyPlanner
         {
             if (selectedProject != null)
             {
-                NewProject editProjectWindow = new NewProject(selectedProject); // Открываем окно редактирования проекта
+                NewProject editProjectWindow = new NewProject(User,selectedProject); // Открываем окно редактирования проекта
                 if (editProjectWindow.ShowDialog() == true)
                 {
                     DisplayProjectDetails(selectedProject); // Обновляем детали проекта
@@ -413,20 +409,35 @@ namespace MyPlanner
 
         private void DeleteProject_Click(object sender, RoutedEventArgs e)
         {
+
             if (selectedProject != null)
             {
-                var result = MessageBox.Show("Вы действительно хотите удалить проект?", "Подтверждение удаления", MessageBoxButton.YesNo);
+                var result = MessageBox.Show("Вы действительно хотите удалить проект?", "Удаление проекта", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
-                    User.Projects.Remove(selectedProject); // Удаляем проект из списка
-                    ProjectsPanel.Children.Clear(); // Обновляем панель проектов
+                    // Удаляем проект из списка проектов пользователя
+                    User.Projects.Remove(selectedProject);
+
+                    // Очищаем панель проектов и перезагружаем её с оставшимися проектами
+                    ProjectsPanel.Children.Clear();
                     foreach (var project in User.Projects)
                     {
                         ProjectsPanel.Children.Add(CreateProjectBorder(project));
                     }
+
+                    // Очищаем таблицу задач и панель заметок
+                    TasksDataGrid.ItemsSource = null;
+                    NotesWrapPanel.Children.Clear();
+
+                    // Сбрасываем выбранный проект и задачу
                     selectedProject = null;
+                    selectedTask = null;
+
+                    // Обновляем отображение (если нужно)
+                    TasksDataGrid.Items.Refresh();
                 }
             }
+
         }
 
         private void EditNote_Click(object sender, RoutedEventArgs e)
@@ -442,7 +453,7 @@ namespace MyPlanner
                     Width = 300
                 };
 
-                var result = MessageBox.Show(noteTextBox, "Редактировать заметку", MessageBoxButton.OKCancel);
+                var result = MessageBox.Show(noteTextBox.Name, "Редактировать заметку", MessageBoxButton.OKCancel);
                 if (result == MessageBoxResult.OK)
                 {
                     note.Content = noteTextBox.Text;
