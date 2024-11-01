@@ -4,7 +4,8 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:MyPlanner.Models"
         Title="Планировщик задач" WindowState="Maximized"
-        Background="White">
+        Background="White"
+        Loaded="MainWindow_Loaded">
     <Window.Resources>
         <!-- Цветовая схема проекта-->
         <SolidColorBrush x:Key="Color1" Color="#FF003B46"/>
@@ -208,8 +209,8 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <RadioButton x:Name="rbActiveProjects" Content="Активные проекты" GroupName="ProjectsView" IsChecked="True" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="0" />
-                    <RadioButton x:Name="rbCompletedProjects" Content="Завершенные проекты" GroupName="ProjectsView" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="1" />
+                    <RadioButton x:Name="rbActiveProjects" Content="Активные проекты" GroupName="ProjectsView" IsChecked="False" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="0"  Checked="rbActiveChecked"/>
+                    <RadioButton x:Name="rbCompletedProjects" Content="Завершенные проекты" GroupName="ProjectsView" IsChecked="False" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="1" Checked="rbCompletedChecked"/>
                 </Grid>
 
                 <!-- Область для отображения проектов с прокруткой -->
@@ -226,6 +227,7 @@
                                 <ContextMenu>
                                     <MenuItem Header="Редактировать проект" Click="EditProject_Click" />
                                     <MenuItem Header="Удалить проект" Click="DeleteProject_Click" />
+                                    <MenuItem Header="Завершить проект" Click="CompleteProjectButton_Click" />
                                 </ContextMenu>
                             </WrapPanel.ContextMenu>
                         </WrapPanel>

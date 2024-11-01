@@ -21,7 +21,6 @@ namespace MyPlanner
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool isEditingTask = false;
 
         User User; //авторизованный пользователь 
         private Project selectedProject; //выбранный проект
@@ -35,11 +34,16 @@ namespace MyPlanner
                 Name = "Me"
             };
             InitializeComponent();
+            Loaded += MainWindow_Loaded; // Подписываемся на событие Loaded
         }
 
-        
 
- 
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            rbActiveProjects.IsChecked = true; // Устанавливаем активные проекты по умолчанию
+            LoadActiveProjects(); // Загружаем активные проекты
+        }
+
 
         private void AddNoteButton_Click(object sender, RoutedEventArgs e)
         {
@@ -138,11 +142,24 @@ namespace MyPlanner
                 // Создаем контейнер для проекта 
                 Border projectBorder = CreateProjectBorder(newProject);
 
-                // Добавляем проект в WrapPanel
-                ProjectsPanel.Children.Add(projectBorder);
+               
 
                 // Добавляем проект в список
                 User.Projects.Add(newProject);
+
+                UpdateProjectDisplay(); // Обновляем отображение проектов
+            }
+        }
+
+        private void UpdateProjectDisplay()
+        {
+            if (rbActiveProjects.IsChecked == true)
+            {
+                LoadActiveProjects();
+            }
+            else if (rbCompletedProjects.IsChecked == true)
+            {
+                LoadCompletedProjects();
             }
         }
 
@@ -403,7 +420,29 @@ namespace MyPlanner
                 if (editProjectWindow.ShowDialog() == true)
                 {
                     DisplayProjectDetails(selectedProject); // Обновляем детали проекта
+                    foreach (Border projectBorder in ProjectsPanel.Children.OfType<Border>())
+                    {
+                        if (projectBorder.Tag == selectedProject)
+                        {
+                            // Обновляем содержимое выбранного проекта
+                            UpdateProjectBorderContent(projectBorder, selectedProject);
+                            break;
+                        }
+                    }
                 }
+            }
+        }
+
+        private void UpdateProjectBorderContent(Border projectBorder, Project project)
+        {
+            if (projectBorder.Child is StackPanel projectContent)
+            {
+                // Обновляем текстовые блоки внутри StackPanel с новыми данными проекта
+                ((TextBlock)projectContent.Children[0]).Text = project.Name;
+                ((TextBlock)projectContent.Children[1]).Text = $"Приоритет: {project.Priority}";
+                ((TextBlock)projectContent.Children[2]).Text = $"Категория: {project.Category}";
+                ((TextBlock)projectContent.Children[3]).Text = $"Создан: {project.CreationDate:dd.MM.yyyy}";
+                ((TextBlock)projectContent.Children[4]).Text = $"Дедлайн: {project.Deadline:dd.MM.yyyy}";
             }
         }
 
@@ -477,6 +516,69 @@ namespace MyPlanner
         }
 
 
+        private void rbActiveChecked(object sender, RoutedEventArgs e)
+        {
+            LoadActiveProjects();
+        }
+
+
+
+        private void rbCompletedChecked(object sender, RoutedEventArgs e)
+        {
+            LoadCompletedProjects();
+        }
+
+        private void LoadActiveProjects()
+        {
+            if (ProjectsPanel == null)
+            {
+                MessageBox.Show("ProjectsPanel не инициализирован!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            ProjectsPanel.Children.Clear();
+            foreach (var project in User.Projects.Where(p => !p.IsCompleted))
+            {
+                ProjectsPanel.Children.Add(CreateProjectBorder(project));
+            }
+        }
+
+        private void LoadCompletedProjects()
+        {
+            ProjectsPanel.Children.Clear();
+            foreach (var project in User.Projects.Where(p => p.IsCompleted))
+            {
+                ProjectsPanel.Children.Add(CreateProjectBorder(project));
+            }
+        }
+
+        private void CompleteProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedProject == null)
+            {
+                MessageBox.Show("Выберите проект!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Проверка статуса завершения
+            if (selectedProject.IsCompleted)
+            {
+                return;
+            }
+
+            // Завершаем проект
+            selectedProject.CompleteProject();
+            MessageBox.Show("Поздравляем, проект завершен!", "Завершение проекта", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // Обновляем отображение проектов
+            if (rbActiveProjects.IsChecked == true)
+            {
+                LoadActiveProjects();
+            }
+            else
+            {
+                LoadCompletedProjects();
+            }
+        }
 
     }
 }

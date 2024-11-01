@@ -21,5 +21,10 @@ namespace MyPlanner.Models
         public Category Category { get; set; } = Category.None;
 
         public bool IsOverdue => !IsCompleted && DateTime.Now > Deadline;
+
+        public void CompleteProject()
+        {
+            IsCompleted = true;
+        }
     }
 }
