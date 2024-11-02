@@ -78,7 +78,7 @@
                 <Label Content="Дедлайн:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
                 <DatePicker x:Name="dpTaskDeadline" HorizontalAlignment="Stretch" Foreground="Black"/>
 
-                <Label Content="Статус задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <Label x:Name="labelTaskStatus" Content="Статус задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
                 <ComboBox x:Name="cbTaskStatus" HorizontalAlignment="Stretch" Foreground="Black"  
                 ItemsSource="{Binding Source={StaticResource TaskStatusEnumSource}}"/>
 

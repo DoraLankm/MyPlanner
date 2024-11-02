@@ -31,6 +31,7 @@ namespace MyPlanner
             Project = selected_project;
             isEditing = false;
             cbTaskStatus.Visibility = Visibility.Hidden;
+            labelTaskStatus.Visibility = Visibility.Hidden;
         }
 
         public TaskWindow(Project selected_project,TaskClass selected_task)
