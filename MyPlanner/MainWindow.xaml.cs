@@ -257,7 +257,7 @@ namespace MyPlanner
                 DisplayProjectDetails(selected_Project);
 
                 // Загружаем задачи для выбранного проекта
-                LoadTasks(selected_Project);
+                LoadTasks();
             }
 
           
@@ -316,15 +316,43 @@ namespace MyPlanner
                 selectedProject.Tasks.Add(newTaskWindow.NewTask);
 
                 // Обновляем DataGrid для отображения новой задачи
-                LoadTasks(selectedProject);
+                LoadTasks();
                 TasksDataGrid.Items.Refresh(); // Обновляем DataGrid
             }
         }
 
-        private void LoadTasks(Project project)
+        private void LoadTasks()
         {
-            // Устанавливаем задачи выбранного проекта как источник данных для DataGrid
-            TasksDataGrid.ItemsSource = project.Tasks;
+            if(selectedProject == null) //проект не выбран
+            {
+                TasksDataGrid.ItemsSource = null;
+                NotesWrapPanel.Children.Clear();
+
+                // Сбрасываем выбранный проект и задачу
+                selectedTask = null;
+
+                // Обновляем отображение (если нужно)
+                TasksDataGrid.Items.Refresh();
+                return;
+            }
+            
+            // Определяем, какой фильтр выбран
+            if (rbActiveTasks.IsChecked == true)
+            {
+                // Загрузить только активные задачи
+                TasksDataGrid.ItemsSource = selectedProject.Tasks.Where(t => t.Status != TaskStatus.Completed).ToList();
+            }
+            else if (rbCompletedTasks.IsChecked == true)
+            {
+                // Загрузить только завершенные задачи
+                TasksDataGrid.ItemsSource = selectedProject.Tasks.Where(t => t.Status == TaskStatus.Completed).ToList();
+            }
+            else
+            {
+                // Загрузить все задачи
+                TasksDataGrid.ItemsSource = selectedProject.Tasks;
+            }
+
             // Обновляем отображение
             TasksDataGrid.Items.Refresh();
         }
@@ -390,10 +418,22 @@ namespace MyPlanner
         {
             if (selectedTask != null)
             {
-                TaskWindow editTaskWindow = new TaskWindow(selectedProject,selectedTask); // Открываем окно редактирования задачи
+                TaskWindow editTaskWindow = new TaskWindow(selectedProject, selectedTask); // Открываем окно редактирования задачи
                 if (editTaskWindow.ShowDialog() == true)
                 {
-                    LoadTasks(selectedProject); // Обновляем список задач после редактирования
+
+                    // Проверяем, завершены ли все задачи в проекте
+                    if (selectedProject.Tasks.All(t => t.Status == TaskStatus.Completed) && !selectedProject.IsCompleted)
+                    {
+                        selectedProject.CompleteProject();
+                        MessageBox.Show("Поздравляем, проект завершен!", "Завершение проекта", MessageBoxButton.OK, MessageBoxImage.Information);
+                        selectedProject = null; //проект не выбран
+                        // Обновляем отображение проектов после завершения
+                        UpdateProjectDisplay();
+                    }
+
+                    // Обновляем список задач после редактирования
+                    LoadTasks();
                 }
             }
         }
@@ -407,7 +447,7 @@ namespace MyPlanner
                 {
                     selectedProject.Tasks.Remove(selectedTask); // Удаляем задачу из списка
                     selectedTask = null;
-                    LoadTasks(selectedProject); // Обновляем таблицу задач
+                    LoadTasks(); // Обновляем таблицу задач
                 }
             }
         }
@@ -479,27 +519,7 @@ namespace MyPlanner
 
         }
 
-        private void EditNote_Click(object sender, RoutedEventArgs e)
-        {
-            if (selectedTask != null && selectedTask.Notes != null && selectedTask.Notes.Count > 0)
-            {
-                var note = selectedTask.Notes.Last(); // Пример: редактируем последнюю заметку
-                TextBox noteTextBox = new TextBox
-                {
-                    Text = note.Content,
-                    AcceptsReturn = true,
-                    MaxLength = 250,
-                    Width = 300
-                };
-
-                var result = MessageBox.Show(noteTextBox.Name, "Редактировать заметку", MessageBoxButton.OKCancel);
-                if (result == MessageBoxResult.OK)
-                {
-                    note.Content = noteTextBox.Text;
-                    LoadNotes(selectedTask); // Обновляем список заметок
-                }
-            }
-        }
+        
 
         private void DeleteNote_Click(object sender, RoutedEventArgs e)
         {
@@ -559,24 +579,31 @@ namespace MyPlanner
                 return;
             }
 
-            // Проверка статуса завершения
-            if (selectedProject.IsCompleted)
-            {
-                return;
-            }
-
+            
             // Завершаем проект
             selectedProject.CompleteProject();
             MessageBox.Show("Поздравляем, проект завершен!", "Завершение проекта", MessageBoxButton.OK, MessageBoxImage.Information);
+            selectedProject = null;
+            // Обновляем отображение проектов после завершения
+            UpdateProjectDisplay();
+            LoadTasks();
 
-            // Обновляем отображение проектов
-            if (rbActiveProjects.IsChecked == true)
+        }
+        
+
+        private void rbActiveTasksChecked(object sender, RoutedEventArgs e)
+        {
+            if (selectedProject != null)
             {
-                LoadActiveProjects();
+                LoadTasks();
             }
-            else
+        }
+
+        private void rbCompletedTasksChecked(object sender, RoutedEventArgs e)
+        {
+            if (selectedProject != null)
             {
-                LoadCompletedProjects();
+                LoadTasks();
             }
         }
 

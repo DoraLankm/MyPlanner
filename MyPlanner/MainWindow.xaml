@@ -289,8 +289,8 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <RadioButton x:Name="rbActiveTasks" Content="Активные задачи" GroupName="TasksView" IsChecked="True" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="0" />
-                            <RadioButton x:Name="rbCompletedTasks" Content="Выполненные задачи" GroupName="TasksView" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="1" />
+                            <RadioButton x:Name="rbActiveTasks" Content="Активные задачи" GroupName="TasksView" IsChecked="True" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="0" Checked="rbActiveTasksChecked" />
+                            <RadioButton x:Name="rbCompletedTasks" Content="Выполненные задачи" GroupName="TasksView" Style="{StaticResource TabRadioButtonStyle}" Grid.Column="1" Checked="rbCompletedTasksChecked"/>
                         </Grid>
 
 
