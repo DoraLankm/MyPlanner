@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyPlanner.Migrations
 {
     [DbContext(typeof(PlanerDbContext))]
-    [Migration("20241027171514_InitialCreate")]
+    [Migration("20241104161852_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -160,6 +160,16 @@ namespace MyPlanner.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordSalt")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 

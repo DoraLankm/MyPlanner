@@ -67,18 +67,18 @@
             <StackPanel>
 
                 <!-- Название задачи -->
-                <Label Content="Название задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <TextBlock Text="Название задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
                 <TextBox x:Name="txtTaskTitle" HorizontalAlignment="Stretch"/>
 
                 <!-- Описание задачи -->
-                <Label Content="Описание задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <TextBlock Text="Описание задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
                 <TextBox x:Name="txtTaskDescription"  HorizontalAlignment="Stretch" AcceptsReturn="True" Height="60" TextWrapping="Wrap"/>
 
                 <!-- Дедлайн задачи -->
-                <Label Content="Дедлайн:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <TextBlock Text="Дедлайн:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
                 <DatePicker x:Name="dpTaskDeadline" HorizontalAlignment="Stretch" Foreground="Black"/>
 
-                <Label x:Name="labelTaskStatus" Content="Статус задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
+                <TextBlock x:Name="labelTaskStatus" Text="Статус задачи:" VerticalAlignment="Center" Foreground="White" FontSize="12"/>
                 <ComboBox x:Name="cbTaskStatus" HorizontalAlignment="Stretch" Foreground="Black"  
                 ItemsSource="{Binding Source={StaticResource TaskStatusEnumSource}}"/>
 

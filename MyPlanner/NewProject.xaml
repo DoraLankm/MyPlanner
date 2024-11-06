@@ -72,23 +72,23 @@
             <StackPanel>
 
                 <!-- Название проекта -->
-                <Label Content="Название проекта:"/>
+                <TextBlock Text="Название проекта:"/>
                 <TextBox x:Name="txtProjectName"/>
 
                 <!-- Описание проекта -->
-                <Label Content="Описание проекта:"/>
+                <TextBlock Text="Описание проекта:"/>
                 <TextBox x:Name="txtProjectDescription" AcceptsReturn="True" Height="60" TextWrapping="Wrap"/>
 
                 <!-- Приоритет -->
-                <Label Content="Приоритет:"/>
+                <TextBlock Text="Приоритет:"/>
                 <ComboBox x:Name="cbPriority" ItemsSource="{Binding Source={StaticResource PriorityEnumSource}}"/>
 
                 <!-- Категория -->
-                <Label Content="Категория:"/>
+                <TextBlock Text="Категория:"/>
                 <ComboBox x:Name="cbCategory" ItemsSource="{Binding Source={StaticResource CategoryEnumSource}}"/>
 
                 <!-- Дедлайн -->
-                <Label Content="Дедлайн:"/>
+                <TextBlock Text="Дедлайн:"/>
                 <DatePicker x:Name="dpDeadline"/>
 
                 <!-- Кнопки -->

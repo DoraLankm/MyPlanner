@@ -55,11 +55,21 @@ namespace MyPlanner.Models
                       .HasMaxLength(50)
                       .IsRequired();  // Поле обязательное
 
-                // Связь с таблицей Project (один ко многим: у пользователя может быть много проектов)
+                // Настройка поля PasswordHash
+                entity.Property(u => u.PasswordHash)
+                      .IsRequired()
+                      .HasMaxLength(256);
+
+                // Настройка поля PasswordSalt
+                entity.Property(u => u.PasswordSalt)
+                      .IsRequired()
+                      .HasMaxLength(256);
+
+                // Связь с таблицей Project (один ко многим)
                 entity.HasMany(u => u.Projects)
-                      .WithOne(p => p.User)   // Один пользователь связан с проектами
+                      .WithOne(p => p.User)
                       .HasForeignKey(p => p.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);  // Если удалить пользователя, проекты также удалятся
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // Конфигурация сущности Project

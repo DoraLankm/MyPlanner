@@ -15,12 +15,12 @@ namespace MyPlanner.Models
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public virtual List<TaskClass> Tasks { get; set; } = new List<TaskClass>();
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
         public DateTime Deadline { get; set; } 
         public Priority Priority { get; set; }
         public Category Category { get; set; } = Category.None;
 
-        public bool IsOverdue => !IsCompleted && DateTime.Now > Deadline;
+        public bool IsOverdue => !IsCompleted && DateTime.UtcNow > Deadline;
 
         public void CompleteProject()
         {

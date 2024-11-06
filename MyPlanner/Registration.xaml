@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyPlanner"
         mc:Ignorable="d"
-        Title="Registration" Height="450" Width="500"
+        Title="Registration" Height="500" Width="500"
         ResizeMode="NoResize">
     <Window.Resources>
 
@@ -33,18 +33,23 @@
             <TextBlock Text="Регистрация" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="White"/>
 
             <StackPanel Margin="0,5">
-                <Label Content="Логин" Foreground="White" FontSize="14"/>
-                <TextBox Width="300" Height="40" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}"/>
+                <TextBlock Text="Имя пользователя" Foreground="White" FontSize="14"/>
+                <TextBox x:Name="NameTextBox" Width="300" Height="40" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}"/>
+            </StackPanel>
+            
+            <StackPanel Margin="0,5">
+                <TextBlock Text="Логин" Foreground="White" FontSize="14"/>
+                <TextBox x:Name="LoginTextBox" Width="300" Height="40" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}"/>
             </StackPanel>
 
             <StackPanel Margin="0,5">
-                <Label Content="Пароль" Foreground="White" FontSize="14"/>
-                <PasswordBox Width="300" Height="40" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}"/>
+                <TextBlock Text="Пароль" Foreground="White" FontSize="14"/>
+                <PasswordBox x:Name="PasswordBox" Width="300" Height="40" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}"/>
             </StackPanel>
 
             <StackPanel Margin="0,5">
-                <Label Content="Подтверждение пароля" Foreground="White" FontSize="14"/>
-                <PasswordBox Width="300" Height="40" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}"/>
+                <TextBlock Text="Подтверждение пароля" Foreground="White" FontSize="14"/>
+                <PasswordBox x:Name="ConfirmPasswordBox" Width="300" Height="40" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}"/>
             </StackPanel>
 
             <Button Content="Зарегистрироваться" Click="RegisterButton_Click" Margin="0,20,0,5" Style="{StaticResource MainButtonStyle}"/>

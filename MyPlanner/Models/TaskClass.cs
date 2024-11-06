@@ -14,7 +14,7 @@ namespace MyPlanner.Models
         public string? Description { get; set; }
         public TaskStatus Status { get; set; } = TaskStatus.NotStarted;
 
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
         public DateTime Deadline { get; set; }
 
         public int ProjectId { get; set; }

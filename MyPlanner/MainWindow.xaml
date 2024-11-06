@@ -195,11 +195,11 @@
                     <Button Content="⚙" ToolTip="Настройки" Width="30" Height="30" Margin="5" Grid.Column="0" Background="Transparent" Foreground="White"/>
                     <!-- Поле поиска -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1">
-                        <TextBox Width="200" Height="30" Margin="5,0" VerticalAlignment="Center" ToolTip="Поиск" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}" BorderBrush="{StaticResource Color1}"/>
-                        <Button Content="🔍" Width="30" Height="30" VerticalAlignment="Center" ToolTip="Запустить поиск" Background="Transparent" Foreground="White" Margin="0"/>
+                        <TextBox x:Name="SearchTextBox" Width="200" Height="30" Margin="5,0" VerticalAlignment="Center" ToolTip="Поиск" Background="{StaticResource Color4}" Foreground="{StaticResource Color1}" BorderBrush="{StaticResource Color1}"/>
+                        <Button Content="🔍" Width="30" Height="30" VerticalAlignment="Center" ToolTip="Запустить поиск" Background="Transparent" Foreground="White" Margin="0" Click="SearchButton_Click"/>
                     </StackPanel>
                     <!-- Кнопка выхода -->
-                    <Button Content="➡️" ToolTip="Выход" Width="30" Height="30" Margin="5" Grid.Column="2" Background="Transparent" Foreground="White"/>
+                    <Button Content="➡️" ToolTip="Выход" Width="30" Height="30" Margin="5" Grid.Column="2" Background="Transparent" Foreground="White" Click="ExitProgram_Click"/>
                 </Grid>
 
                 <!-- RadioButton для выбора проектов -->

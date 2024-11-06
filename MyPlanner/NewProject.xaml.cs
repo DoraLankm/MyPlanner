@@ -1,52 +1,42 @@
 ﻿using MyPlanner.Models;
+using MyPlanner.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace MyPlanner
 {
-    /// <summary>
-    /// Логика взаимодействия для NewProject.xaml
-    /// </summary>
     public partial class NewProject : Window
     {
         User User { get; set; }
         public Project Project { get; private set; }
-        bool isEditing; //режим редактирования
+        private readonly ProjectService _projectService;
+        bool isEditing;
 
-        public NewProject(User user)
+        public NewProject(User user, ProjectService projectService)
         {
             InitializeComponent();
 
-            cbPriority.SelectedItem = Priority.Medium; // Значение по умолчанию
-            cbCategory.SelectedItem = Category.None; // Значение по умолчанию
-            dpDeadline.SelectedDate = DateTime.Now.AddDays(7); //Значение по умолчанию
-            isEditing = false; //режим создания нового проекта
+            cbPriority.SelectedItem = Priority.Medium;
+            cbCategory.SelectedItem = Category.None;
+            dpDeadline.SelectedDate = DateTime.UtcNow.AddDays(7);
+            isEditing = false;
             User = user;
+            _projectService = projectService;
         }
 
-        public NewProject(User user,Project project)
+        public NewProject(User user, Project project, ProjectService projectService)
         {
             InitializeComponent();
-            isEditing = true; //режим редактирования существующего проекта 
+            isEditing = true;
             Project = project;
             cbCategory.SelectedItem = Project.Category;
             cbPriority.SelectedItem = Project.Priority;
             txtProjectName.Text = Project.Name;
             txtProjectDescription.Text = Project.Description;
-            dpDeadline.SelectedDate = Project.Deadline;
+            dpDeadline.SelectedDate = Project.Deadline.ToLocalTime();
             User = user;
-
+            _projectService = projectService;
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
@@ -63,19 +53,20 @@ namespace MyPlanner
                 return;
             }
 
-            if (!isEditing) //создание новой задачи
+            DateTime deadline = (dpDeadline.SelectedDate ?? DateTime.UtcNow.AddDays(7)).ToUniversalTime();
+
+            if (!isEditing)
             {
-                // Создаем новый проект
                 Project = new Project
                 {
                     Name = txtProjectName.Text,
                     Description = txtProjectDescription.Text,
-                    Deadline = dpDeadline.SelectedDate ?? DateTime.Now.AddDays(7),
+                    Deadline = deadline,
                     Priority = (Priority)cbPriority.SelectedItem,
                     Category = (Category)cbCategory.SelectedItem,
-                    CreationDate = DateTime.Now,
+                    CreationDate = DateTime.UtcNow,
                     IsCompleted = false,
-                    User = User
+                    UserId = User.Id
                 };
             }
             else
@@ -84,9 +75,8 @@ namespace MyPlanner
                 Project.Description = txtProjectDescription.Text;
                 Project.Category = (Category)cbCategory.SelectedItem;
                 Project.Priority = (Priority)cbPriority.SelectedItem;
-                Project.Deadline = dpDeadline.SelectedDate ?? DateTime.Now.AddDays(7);
+                Project.Deadline = deadline;
             }
-                
 
             DialogResult = true;
             Close();
@@ -100,16 +90,15 @@ namespace MyPlanner
 
         bool IsProjectNameUnique(string name)
         {
-            foreach (var project in User.Projects)
+            var existingProject = _projectService.GetProjectByNameAndUserId(name, User.Id);
+
+            if (existingProject != null)
             {
-                if (project.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                if (isEditing && existingProject.Id == Project.Id)
                 {
-                    if (isEditing && name == Project.Name) //режим редактирования,назвнаие не изменилось
-                    {
-                        continue;
-                    }
-                    return false;
+                    return true;
                 }
+                return false;
             }
 
             return true;

@@ -13,5 +13,8 @@ namespace MyPlanner.Models
         public string Login { get; set; }
         public virtual List<Project> Projects { get; set; } = new List<Project>();
 
+        public string PasswordHash { get; set; }
+        public string PasswordSalt { get; set; }
+
     }
 }
